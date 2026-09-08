@@ -31,14 +31,19 @@ process.stdin.on("data", (key) => {
             selectedSong = (selectedSong + 1) % songsObj.length;
             render()
             break;
+        case "\r":
+            console.log(`Playing: ${songsObj[selectedSong].name}`);
 
+            break;
         case "\u0003":
             process.exit();
     }
 });
 
+
 function render(){
     console.clear();
+    
     console.log();
     console.log();
     console.log(`
@@ -52,13 +57,13 @@ function render(){
                 ║                                                      ║
                 ║     ↑ ↓   Navigate                                   ║
                 ║     ↵     Play Song                                  ║
-                ║     Q     Quit                                       ║
                 ║                                                      ║
                 ╚══════════════════════════════════════════════════════╝
             `);
 
     console.log("")
     console.log("")
+
     songsObj.forEach((song, idx)=>{
         if(idx === selectedSong){
             console.log(`> ${song.name}`);
