@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { spawn } = require('child_process');
 const songs = fs.readdirSync("./Songs").filter(file => file.endsWith('.mp3'));
 
 process.stdin.setRawMode(true);
@@ -15,8 +16,8 @@ const songsObj = songs.map(song => {
 });
 
 let selectedSong = 0;
+let playerProcess;
 
-// console.log(songsObj[selectedSong].name);
 
 process.stdin.on("data", (key) => {
     switch (key) {
@@ -32,10 +33,20 @@ process.stdin.on("data", (key) => {
             render()
             break;
         case "\r":
+            playSong();
             console.log(`Playing: ${songsObj[selectedSong].name}`);
-
+            break;
+        case " ":
+            if (playerProcess) {
+                playerProcess.kill();
+                playerProcess = null;
+                console.log("Playback stopped.");
+            }
             break;
         case "\u0003":
+            if (playerProcess) {
+                playerProcess.kill();
+            }
             process.exit();
     }
 });
@@ -72,10 +83,16 @@ function render(){
         }
     })
 
-    console.log("Use UP and DOWN arrow keys to navigate through the songs. Press Ctrl+C to exit.");
+    console.log("Use UP and DOWN arrow keys to navigate. Press Enter to play, Space to stop, or Ctrl+C to exit.");
+}
+
+function playSong(){
+    if (playerProcess) {
+        playerProcess.kill();
+    }
+
+    playerProcess = spawn('vlc', [songsObj[selectedSong].path] );
 }
 
 render()
-
-
 
