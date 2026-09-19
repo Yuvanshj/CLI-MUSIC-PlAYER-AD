@@ -13,6 +13,7 @@ const songs = fs.readdirSync('./Songs')
     });
 
 let selectedIndex = 0;
+let currentSongIndex = -1;
 let currentSong = null;
 let player = null;
 let timer = null;
@@ -87,6 +88,8 @@ function render() {
 function playSong(index) {
     stopPlayback();
 
+    currentSongIndex = index;
+    selectedIndex = index;
     currentSong = songs[index];
     elapsed = 0;
     isPaused = false;
@@ -103,8 +106,8 @@ function playSong(index) {
     player.stdout.on('data', () => {});
 
     player.on('close', () => {
-        stopPlayback();
-        render();
+        const nextIndex = (currentSongIndex + 1) % songs.length;
+        playSong(nextIndex);
     });
 
     timer = setInterval(() => {
@@ -139,6 +142,7 @@ function stopPlayback() {
     clearInterval(timer);
     timer = null;
     currentSong = null;
+    currentSongIndex = -1;
     elapsed = 0;
     isPaused = false;
 }
